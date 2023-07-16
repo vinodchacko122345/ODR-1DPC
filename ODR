@@ -1,0 +1,100 @@
+clear;
+
+ios=sqrt(-1);
+angles=0;%angle of incidence from the ambient layer
+o1s=1;
+thetas=pi.*angles./180;
+mts=-1;%-1for TE and 1 for TM
+nls=8;% NO. OF CELLS
+n1s=1;%refractive index of the ambient medium
+d1s=800/(4*3.42);
+d2s=800/(4*1.45);
+rrs=[3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45];
+ris=[0,0,0,0,0,0,0,0];
+ds=[d1s,d2s,d1s,d2s,d1s,d2s,d1s,d2s];
+dls=0;
+for wls=400:.1:2000
+ for is=1:nls
+ rinds(is)=complex(rrs(is),-ris(is));
+ dls=dls+ds(is);
+end
+theta1s=(asin(n1s*sin(thetas)/rinds(1)));
+theta2s=(asin(rinds(1)*sin(theta1s)/rinds(2)));
+thetaas=[theta1s,theta2s,theta1s,theta2s,theta1s,theta2s,theta1s,theta2s];
+rks=2*pi/wls;
+for ejs=1:nls
+ aks(ejs)=(rks*rinds(ejs)*cos(thetaas(ejs)));
+end
+if(mts<00)
+ etaas=(aks(nls-1)/aks(nls));
+else
+ etaas=((aks(nls-1)/aks(nls))*((rinds(nls)^2/rinds(nls-1)^2)));
+end
+for oos=2:nls
+ iis=oos-1;
+ps=(exp(ios*aks(iis)*ds(iis))*(cos(aks(oos)*ds(oos))+(0.5*ios*(etaas+(1/etaas))*sin(aks(oos)*ds(oos)))));
+qs=(exp(-ios*aks(iis)*ds(iis))*(0.5*ios*(etaas-(1/etaas))*sin(aks(oos)*ds(oos))));
+rs=(exp(ios*aks(iis)*ds(iis))*(-0.5*ios*(etaas-(1/etaas))*sin(aks(oos)*ds(oos))));
+ss=(exp(-ios*aks(iis)*ds(iis))*(cos(aks(oos)*ds(oos))-(0.5*ios*(etaas+(1/etaas))*sin(aks(oos)*ds(oos)))));
+kws=(1/dls)*acos((cos(aks(iis)*ds(iis))*cos(aks(oos)*ds(oos)))-(0.5*(etaas+(1/etaas))*(sin(aks(iis)*ds(iis))*sin(aks(oos)*ds(oos)))));
+end
+kw1ste6(o1s)=kws*dls/(2*pi);
+vinste6=[ps,qs;rs,ss]^nls;
+ref1ste6(o1s)=(abs((vinste6(3)/vinste6(1))))^2;
+trns1ste6(o1s)=1-ref1ste6(o1s);
+w1ste6(o1s)=wls;
+o1s=o1s+1;
+end
+
+
+ios=sqrt(-1);
+angles=90;%angle of incidence from the ambient layer
+o1s=1;
+thetas=pi.*angles./180;
+mts=1;%-1for TE and 1 for TM
+nls=8;% NO. OF CELLS
+n1s=1;%refractive index of the ambient medium
+d1s=800/(4*3.42);
+d2s=800/(4*1.45);
+rrs=[3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45];
+ris=[0,0,0,0,0,0,0,0];
+ds=[d1s,d2s,d1s,d2s,d1s,d2s,d1s,d2s];
+dls=0;
+for wls=400:.1:2000
+ for is=1:nls
+ rinds(is)=complex(rrs(is),-ris(is));
+ dls=dls+ds(is);
+end
+theta1s=(asin(n1s*sin(thetas)/rinds(1)));
+theta2s=(asin(rinds(1)*sin(theta1s)/rinds(2)));
+thetaas=[theta1s,theta2s,theta1s,theta2s,theta1s,theta2s,theta1s,theta2s];
+rks=2*pi/wls;
+for ejs=1:nls
+ aks(ejs)=(rks*rinds(ejs)*cos(thetaas(ejs)));
+end
+if(mts<00)
+ etaas=(aks(nls-1)/aks(nls));
+else
+ etaas=((aks(nls-1)/aks(nls))*((rinds(nls)^2/rinds(nls-1)^2)));
+end
+for oos=2:nls
+ iis=oos-1;
+ps=(exp(ios*aks(iis)*ds(iis))*(cos(aks(oos)*ds(oos))+(0.5*ios*(etaas+(1/etaas))*sin(aks(oos)*ds(oos)))));
+qs=(exp(-ios*aks(iis)*ds(iis))*(0.5*ios*(etaas-(1/etaas))*sin(aks(oos)*ds(oos))));
+rs=(exp(ios*aks(iis)*ds(iis))*(-0.5*ios*(etaas-(1/etaas))*sin(aks(oos)*ds(oos))));
+ss=(exp(-ios*aks(iis)*ds(iis))*(cos(aks(oos)*ds(oos))-(0.5*ios*(etaas+(1/etaas))*sin(aks(oos)*ds(oos)))));
+kws=(1/dls)*acos((cos(aks(iis)*ds(iis))*cos(aks(oos)*ds(oos)))-(0.5*(etaas+(1/etaas))*(sin(aks(iis)*ds(iis))*sin(aks(oos)*ds(oos)))));
+end
+kw1stm4(o1s)=kws*dls/(2*pi);
+vinstm4=[ps,qs;rs,ss]^nls;
+ref1stm4(o1s)=(abs((vinstm4(3)/vinstm4(1))))^2;
+trns1stm4(o1s)=1-ref1stm4(o1s);
+w1stm4(o1s)=wls;
+o1s=o1s+1;
+end
+
+plot(w1stm4,ref1stm4,'b',w1ste6,ref1ste6,'r')
+title('ODR in  (Si-SiO2) N=8 at lo=800nm')
+xlabel('Wavelength (nm)')
+ylabel('Reflectivity')
+legend('TE','TM')
